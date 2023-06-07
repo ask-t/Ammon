@@ -1,6 +1,6 @@
 import java.awt.*;
 
-class Water extends Sprite {
+public class Water extends Sprite {
     public Water(int x, int y) {
         super();
         image = null;

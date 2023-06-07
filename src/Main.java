@@ -2,27 +2,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-class Main extends JPanel {
-    private int numRows;
-    private int numColumns;
-    private Point margin;
-    private Point windowSize;
+public class Main extends JPanel {
+    // fields
+    Style style = new Style();
+    private int numRows = style.numRows;
+    private int numColumns = style.numColumns;
+    private int squareSize = style.squareSize;
+    private Point margin = style.margin;
     private Ammon ammon;
     private ArrayList<Sheep> sheepList;
     private ArrayList<Robber> robberList;
     private ArrayList<Tree> treeList;
     private ArrayList<Water> waterList;
 
+    // Constructor
     public Main() {
-        numRows = 10;
-        numColumns = 10;
-        margin = new Point(15,15);
-        windowSize = new Point(numRows*50+margin.x*4 ,numColumns*50+margin.y*5);
+
+        // Array
         sheepList = new ArrayList<>();
         robberList = new ArrayList<>();
         treeList = new ArrayList<>();
         waterList = new ArrayList<>();
 
+        //Objects
         ammon = new Ammon(5, 8);
         sheepList.add(new Sheep(4, 0));
         sheepList.add(new Sheep(9, 0));
@@ -74,13 +76,14 @@ class Main extends JPanel {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    public void paintComponent(Graphics g) {
+        Style style = new Style();
         super.paintComponent(g);
         setBackground(Color.LIGHT_GRAY);
 
-        // Draw background of the map
-        g.setColor(new Color(255, 179, 102)); // Earthy color
-        g.fillRect(margin.x, margin.y, numColumns * 50, numRows * 50);
+        // Draw background of the map. Each square size is 50x50px (default) check Style.java
+        g.setColor(new Color(255, 179, 102));
+        g.fillRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
 
 
         // Draw all the sprites
@@ -103,14 +106,14 @@ class Main extends JPanel {
         }
         // Draw map border
         g.setColor(Color.BLACK);
-        g.drawRect(margin.x, margin.y, numColumns * 50, numRows * 50);
+        g.drawRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
     }
 
     public static void main(String[] args) {
-        Main Main = new Main();
+        Style style = new Style();
         JFrame window = new JFrame("Ammon");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setSize(Main.windowSize.x, Main.windowSize.y);
+        window.setSize(style.windowSize.x, style.windowSize.y);
         window.setContentPane(new Main());
         window.setVisible(true);
 

@@ -1,10 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 
-class Sprite {
+public class Sprite {
     protected Point absolutePosition;
     protected Point relativePosition;
     protected ImageIcon image;
+    Style style = new Style();
+    private int squareSize = style.squareSize;
+    private Point margin = style.margin;
 
     public Sprite() {
         absolutePosition = new Point();
@@ -14,7 +17,7 @@ class Sprite {
 
     public void setLocation(int x, int y) {
         relativePosition.setLocation(x, y);
-        absolutePosition.setLocation(relativePosition.x * 50+15, relativePosition.y * 50+15);
+        absolutePosition.setLocation(relativePosition.x * squareSize+margin.x, relativePosition.y * squareSize+margin.y);
     }
 
     public void setLocation(Point p) {

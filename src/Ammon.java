@@ -1,9 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-class Ammon extends Sprite {
+public class Ammon extends Sprite {
     public Ammon(int x, int y) {
         super();
         image = new ImageIcon("images/Ammon2.png");
+        // resize image
         Image image2 = image.getImage();
         int width = 35;
         int height = 35;
