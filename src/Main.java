@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
-public class Main extends JPanel {
+public class Main extends JPanel implements KeyListener {
     // fields
     Style style = new Style();
     private int numRows = style.numRows;
@@ -73,16 +75,22 @@ public class Main extends JPanel {
         waterList.add(new Water(9, 2));
         waterList.add(new Water(9,8 ));
         waterList.add(new Water(9, 9));
+        addKeyListener(this);
+        setFocusable(true);
+        requestFocusInWindow();
     }
 
     @Override
     public void paintComponent(Graphics g) {
-        Style style = new Style();
         super.paintComponent(g);
         setBackground(Color.LIGHT_GRAY);
 
-        // Draw background of the map. Each square size is 50x50px (default) check Style.java
-        g.setColor(new Color(255, 179, 102));
+        /*
+        Draw background of the map. Each square size is 50x50px (default) check Style.java
+        The Number of Squares is 10x10
+        The size of Rectangle is 50px x 10 squares = 500px (default)
+        */
+        g.setColor(new Color(222, 132, 20));
         g.fillRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
 
 
@@ -108,6 +116,60 @@ public class Main extends JPanel {
         g.setColor(Color.BLACK);
         g.drawRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
     }
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
+
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+
+        // Arrow key handling
+        if (key == KeyEvent.VK_LEFT) {
+            moveAmmon(-1, 0);
+        } else if (key == KeyEvent.VK_RIGHT) {
+            moveAmmon(1, 0);
+        } else if (key == KeyEvent.VK_UP) {
+            moveAmmon(0, -1);
+        } else if (key == KeyEvent.VK_DOWN) {
+            moveAmmon(0, 1);
+        }
+    }
+
+    private void moveAmmon(int dx, int dy) {
+        Point nextPos = ammon.getter();
+        nextPos.translate(dx, dy);
+
+        if (isWithinMapBounds(nextPos) && !hitATree(nextPos)) {
+            ammon.setLocation(nextPos);
+            repaint();
+            System.out.println("True");
+        }
+        else{
+            nextPos.translate(-dx, -dy);
+            System.out.println("False");
+        }
+    }
+
+
+    private boolean isWithinMapBounds(Point p) {
+        return p.x >= 0 && p.x < numColumns && p.y >= 0 && p.y < numRows;
+    }
+
+    private boolean hitATree(Point p) {
+        for (Tree tree : treeList) {
+            if (tree.getter().equals(p)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static void main(String[] args) {
         Style style = new Style();
@@ -118,4 +180,6 @@ public class Main extends JPanel {
         window.setVisible(true);
 
     }
+
+
 }
