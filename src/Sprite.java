@@ -38,7 +38,7 @@ abstract class Sprite {
             image.paintIcon(null, g, absolutePosition.x, absolutePosition.y);
         }
     }
-
+    // return the relative Position.
     public Point getter(){
         return relativePosition;
     }

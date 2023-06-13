@@ -77,6 +77,8 @@ public class Main extends JPanel implements KeyListener {
         waterList.add(new Water(9, 9));
         addKeyListener(this);
         setFocusable(true);
+
+        //tell our class to handle its own key events...
         requestFocusInWindow();
     }
 
@@ -116,6 +118,7 @@ public class Main extends JPanel implements KeyListener {
         g.setColor(Color.BLACK);
         g.drawRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
     }
+//    Don't use those
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -126,6 +129,7 @@ public class Main extends JPanel implements KeyListener {
     }
 
 
+    // setting up Dpad
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
@@ -141,27 +145,28 @@ public class Main extends JPanel implements KeyListener {
             moveAmmon(0, 1);
         }
     }
-
+    //method of moving Ammon
     private void moveAmmon(int dx, int dy) {
         Point nextPos = ammon.getter();
-        nextPos.translate(dx, dy);
+        nextPos.translate(dx, dy); // update relative position
 
         if (isWithinMapBounds(nextPos) && !hitATree(nextPos)) {
-            ammon.setLocation(nextPos);
-            repaint();
+            ammon.setLocation(nextPos); // finalize
+            repaint(); // update the location of image
             System.out.println("True");
         }
         else{
-            nextPos.translate(-dx, -dy);
+            nextPos.translate(-dx, -dy); // reset position.
             System.out.println("False");
         }
     }
 
-
+    // prevent going to out of the map
     private boolean isWithinMapBounds(Point p) {
         return p.x >= 0 && p.x < numColumns && p.y >= 0 && p.y < numRows;
     }
 
+    // prevent going into the trees.
     private boolean hitATree(Point p) {
         for (Tree tree : treeList) {
             if (tree.getter().equals(p)) {
