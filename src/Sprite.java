@@ -9,6 +9,8 @@ abstract class Sprite {
     private int squareSize = style.squareSize;
     private Point margin = style.margin;
 
+
+
     public Sprite() {
         absolutePosition = new Point();
         relativePosition = new Point();
@@ -53,4 +55,5 @@ abstract class Sprite {
         Point ot = other.getter();
         return re.x == ot.x - 1 && re.y == ot.y || re.x == ot.x + 1 && re.y == ot.y || re.x == ot.x && re.y == ot.y - 1 || re.x == ot.x && re.y == ot.y + 1;
     }
+
 }

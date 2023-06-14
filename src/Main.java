@@ -96,6 +96,7 @@ public class Main extends JPanel implements KeyListener {
         // count how many sheep in the map.
         numSheep = sheepList.size();
         System.out.println("Sheep is "+ numSheep);
+
     }
 
     @Override
@@ -172,24 +173,37 @@ public class Main extends JPanel implements KeyListener {
                 sheep.setLocation(null);
                 numSheep--;
                 if (numSheep == 0) {
-                    JOptionPane.showMessageDialog(this, "Congratulations! You rescued all the sheep!");
-                    reset();
+                    int option = JOptionPane.showConfirmDialog(this, "Congratulations! You rescued all the sheep! \n Do you want to continue?", "you clear!" , JOptionPane.YES_NO_OPTION);
+                    if(option == 0){
+                        reset();
+                        break;
+                    } else if (option == 1) {
+                        System.exit(0);
+                    }
                 }
-                break;
             }
         }
         for (Water water: waterList){
             if(ammon.isTouching(water)){
-                JOptionPane.showMessageDialog(this, "Sorry, Ammon died in the water.");
-                reset();
-                break;
+
+                int option = JOptionPane.showConfirmDialog(this, "Sorry, Ammon died in the water. \n Do you want to continue?", "you are dead" , JOptionPane.YES_NO_OPTION);
+                if(option == 0){
+                    reset();
+                    break;
+                } else if (option == 1) {
+                    System.exit(0);
+                }
             }
         }
         for(Robber robber: robberList){
             if(ammon.isNear(robber)){
-                JOptionPane.showMessageDialog(this, "Sorry, Ammon died near a robber.");
-                reset();
-                break;
+                int option = JOptionPane.showConfirmDialog(this, "Sorry, Ammon died near a robber. \n Do you want to continue?", "you are dead" , JOptionPane.YES_NO_OPTION);
+                if(option == 0){
+                    reset();
+                    break;
+                } else if (option == 1) {
+                    System.exit(0);
+                }
             }
         }
 
@@ -237,9 +251,11 @@ public class Main extends JPanel implements KeyListener {
 
 
 
+
+
     public static void main(String[] args) {
         Style style = new Style();
-        JFrame window = new JFrame("Ammon");
+        JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setSize(style.windowSize.x, style.windowSize.y);
         window.setContentPane(new Main());
