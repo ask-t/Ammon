@@ -42,4 +42,21 @@ abstract class Sprite {
     public Point getter(){
         return relativePosition;
     }
+
+    public boolean isTouching(Sprite other){
+        if(this.getter().equals(other.getter())){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public boolean isNear(Sprite other){
+        var re = this.getter();
+        var ot = other.getter();
+        if(re.x == ot.x-1 && re.y == ot.y|| re.x == ot.x+1 && re.y == ot.y||re.x == ot.x &&re.y == ot.y-1||re.x == ot.x &&re.y == ot.y+1 ){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

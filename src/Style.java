@@ -6,7 +6,7 @@ public class Style {
     protected int numColumns = 10;
 
 
-    protected int squareSize = 50;
+    protected int squareSize = 50; // px
 
     // for JFrame
     protected Point margin = new Point(15,15);

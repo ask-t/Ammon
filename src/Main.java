@@ -16,6 +16,8 @@ public class Main extends JPanel implements KeyListener {
     private ArrayList<Robber> robberList;
     private ArrayList<Tree> treeList;
     private ArrayList<Water> waterList;
+    private int numSheep;
+    private int dead;
 
     // Constructor
     public Main() {
@@ -80,6 +82,9 @@ public class Main extends JPanel implements KeyListener {
 
         //tell our class to handle its own key events...
         requestFocusInWindow();
+
+        numSheep = sheepList.size();
+        System.out.println("Sheep is "+ numSheep);
     }
 
     @Override
@@ -153,12 +158,30 @@ public class Main extends JPanel implements KeyListener {
         if (isWithinMapBounds(nextPos) && !hitATree(nextPos)) {
             ammon.setLocation(nextPos); // finalize
             repaint(); // update the location of image
-            System.out.println("True");
         }
         else{
             nextPos.translate(-dx, -dy); // reset position.
-            System.out.println("False");
         }
+        for (Sheep sheep : sheepList) {
+            if(ammon.isTouching(sheep)){
+                sheep.setLocation(null);
+                numSheep-=1;
+            }
+        }
+        for (Water water: waterList){
+            if(ammon.isTouching(water)){
+//                System.out.println("Water:True " + dead);
+//                dead+=1;
+            }
+        }
+        for(Robber robber: robberList){
+            if(ammon.isNear(robber)){
+                System.out.println("Robber:True " +dead);
+                dead+=1;
+            }
+        }
+
+
     }
 
     // prevent going to out of the map
@@ -175,6 +198,24 @@ public class Main extends JPanel implements KeyListener {
         }
         return false;
     }
+
+
+    private void reset(){
+        sheepList.clear();
+        sheepList.add(new Sheep(4, 0));
+        sheepList.add(new Sheep(9, 0));
+        sheepList.add(new Sheep(0, 3));
+        sheepList.add(new Sheep(5, 3));
+        sheepList.add(new Sheep(9, 5));
+        sheepList.add(new Sheep(2, 6));
+        sheepList.add(new Sheep(0, 7));
+        sheepList.add(new Sheep(7, 9));
+        ammon.setLocation(5,8);
+        repaint();
+
+    }
+
+
 
     public static void main(String[] args) {
         Style style = new Style();
