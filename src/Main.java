@@ -16,8 +16,10 @@ public class Main extends JPanel implements KeyListener {
     private ArrayList<Robber> robberList;
     private ArrayList<Tree> treeList;
     private ArrayList<Water> waterList;
+
+    //this is used as a polymorphism.
+    private ArrayList<Sprite> objects;
     private int numSheep;
-    private int dead;
 
     // Constructor
     public Main() {
@@ -27,6 +29,7 @@ public class Main extends JPanel implements KeyListener {
         robberList = new ArrayList<>();
         treeList = new ArrayList<>();
         waterList = new ArrayList<>();
+        objects = new ArrayList<>();
 
         //Objects
         ammon = new Ammon(5, 8);
@@ -38,11 +41,6 @@ public class Main extends JPanel implements KeyListener {
         sheepList.add(new Sheep(2, 6));
         sheepList.add(new Sheep(0, 7));
         sheepList.add(new Sheep(7, 9));
-        robberList.add(new Robber(2, 0));
-        robberList.add(new Robber(7, 2));
-        robberList.add(new Robber(4, 4));
-        robberList.add(new Robber(9, 7));
-        robberList.add(new Robber(2, 9));
         treeList.add(new Tree(0, 4));
         treeList.add(new Tree(0, 5));
         treeList.add(new Tree(1, 4));
@@ -77,12 +75,25 @@ public class Main extends JPanel implements KeyListener {
         waterList.add(new Water(9, 2));
         waterList.add(new Water(9,8 ));
         waterList.add(new Water(9, 9));
+        robberList.add(new Robber(1, 0));
+        robberList.add(new Robber(7, 2));
+        robberList.add(new Robber(5, 5));
+        robberList.add(new Robber(9, 7));
+        robberList.add(new Robber(2, 9));
         addKeyListener(this);
         setFocusable(true);
 
         //tell our class to handle its own key events...
         requestFocusInWindow();
 
+        // add all objects from sprite lists.
+        objects.add(ammon);
+        objects.addAll(sheepList);
+        objects.addAll(treeList);
+        objects.addAll(waterList);
+        objects.addAll(robberList);
+
+        // count how many sheep in the map.
         numSheep = sheepList.size();
         System.out.println("Sheep is "+ numSheep);
     }
@@ -102,28 +113,15 @@ public class Main extends JPanel implements KeyListener {
 
 
         // Draw all the sprites
-        ammon.draw(g);
-
-        for (Sheep sheep : sheepList) {
-            sheep.draw(g);
+        for(var object: objects){
+            object.draw(g);
         }
 
-        for (Robber robber : robberList) {
-            robber.draw(g);
-        }
-
-        for (Tree tree : treeList) {
-            tree.draw(g);
-        }
-
-        for (Water water : waterList) {
-            water.draw(g);
-        }
         // Draw map border
         g.setColor(Color.BLACK);
         g.drawRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
     }
-//    Don't use those
+    //    Don't use those
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -162,22 +160,36 @@ public class Main extends JPanel implements KeyListener {
         else{
             nextPos.translate(-dx, -dy); // reset position.
         }
+        /*
+        When the boolean is true, this sheep will disappear.
+        Also, the counter of sheep will negative one.
+        when the counter is zero, the game will be finished.
+        In terms of water and robber, it is same methods with sheep.
+        when the status is true, some action will happen.
+        */
         for (Sheep sheep : sheepList) {
             if(ammon.isTouching(sheep)){
                 sheep.setLocation(null);
-                numSheep-=1;
+                numSheep--;
+                if (numSheep == 0) {
+                    JOptionPane.showMessageDialog(this, "Congratulations! You rescued all the sheep!");
+                    reset();
+                }
+                break;
             }
         }
         for (Water water: waterList){
             if(ammon.isTouching(water)){
-//                System.out.println("Water:True " + dead);
-//                dead+=1;
+                JOptionPane.showMessageDialog(this, "Sorry, Ammon died in the water.");
+                reset();
+                break;
             }
         }
         for(Robber robber: robberList){
             if(ammon.isNear(robber)){
-                System.out.println("Robber:True " +dead);
-                dead+=1;
+                JOptionPane.showMessageDialog(this, "Sorry, Ammon died near a robber.");
+                reset();
+                break;
             }
         }
 
@@ -200,6 +212,11 @@ public class Main extends JPanel implements KeyListener {
     }
 
 
+    /*
+    when it is called, all sheep will set in the default position.
+    then sheep counter will be default number.
+    After those sheeps will be added into sheepList and objects List.
+     */
     private void reset(){
         sheepList.clear();
         sheepList.add(new Sheep(4, 0));
@@ -211,7 +228,10 @@ public class Main extends JPanel implements KeyListener {
         sheepList.add(new Sheep(0, 7));
         sheepList.add(new Sheep(7, 9));
         ammon.setLocation(5,8);
+        numSheep = sheepList.size();
+        objects.addAll(sheepList);
         repaint();
+        System.out.println("everything is reset");
 
     }
 
