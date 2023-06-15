@@ -93,6 +93,9 @@ public class Main extends JPanel implements KeyListener {
         objects.addAll(waterList);
         objects.addAll(robberList);
 
+        for(var object: objects){
+            System.out.println(object);
+        }
         // count how many sheep in the map.
         numSheep = sheepList.size();
         System.out.println("Sheep is "+ numSheep);
@@ -113,14 +116,27 @@ public class Main extends JPanel implements KeyListener {
         g.fillRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
 
 
-        // Draw all the sprites
-        for(var object: objects){
-            object.draw(g);
-        }
-
         // Draw map border
         g.setColor(Color.BLACK);
         g.drawRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
+
+        // Draw all the sprites
+//        ammon.draw(g);
+//        for (Sheep sheep : sheepList) {
+//            sheep.draw(g);
+//        }
+//        for (Water water : waterList) {
+//            water.draw(g);
+//        }
+//        for (Robber robber : robberList) {
+//            robber.draw(g);
+//        }
+//        for (Tree tree : treeList) {
+//            tree.draw(g);
+//        }
+        for(Sprite object: objects){
+            object.draw(g);
+        }
     }
     //    Don't use those
     @Override
@@ -232,7 +248,11 @@ public class Main extends JPanel implements KeyListener {
     After those sheeps will be added into sheepList and objects List.
      */
     private void reset(){
+        for (Sheep sheep: sheepList){
+            sheep.setLocation(null);
+        }
         sheepList.clear();
+        ammon.setLocation(new Point(0, 0));
         sheepList.add(new Sheep(4, 0));
         sheepList.add(new Sheep(9, 0));
         sheepList.add(new Sheep(0, 3));
@@ -242,12 +262,15 @@ public class Main extends JPanel implements KeyListener {
         sheepList.add(new Sheep(0, 7));
         sheepList.add(new Sheep(7, 9));
         ammon.setLocation(5,8);
-        numSheep = sheepList.size();
         objects.addAll(sheepList);
+        numSheep = sheepList.size();
         repaint();
         System.out.println("everything is reset");
+        System.out.println("Sheep is: "+numSheep);
 
     }
+
+
 
 
 
