@@ -121,19 +121,6 @@ public class Main extends JPanel implements KeyListener {
         g.drawRect(margin.x, margin.y, numColumns * squareSize, numRows * squareSize);
 
         // Draw all the sprites
-//        ammon.draw(g);
-//        for (Sheep sheep : sheepList) {
-//            sheep.draw(g);
-//        }
-//        for (Water water : waterList) {
-//            water.draw(g);
-//        }
-//        for (Robber robber : robberList) {
-//            robber.draw(g);
-//        }
-//        for (Tree tree : treeList) {
-//            tree.draw(g);
-//        }
         for(Sprite object: objects){
             object.draw(g);
         }
@@ -252,7 +239,6 @@ public class Main extends JPanel implements KeyListener {
             sheep.setLocation(null);
         }
         sheepList.clear();
-        ammon.setLocation(new Point(0, 0));
         sheepList.add(new Sheep(4, 0));
         sheepList.add(new Sheep(9, 0));
         sheepList.add(new Sheep(0, 3));
