@@ -3,23 +3,26 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Main extends JPanel implements KeyListener {
     // fields
     Style style = new Style();
-    private int numRows = style.numRows;
-    private int numColumns = style.numColumns;
-    private int squareSize = style.squareSize;
-    private Point margin = style.margin;
-    private Ammon ammon;
-    private ArrayList<Sheep> sheepList;
-    private ArrayList<Robber> robberList;
-    private ArrayList<Tree> treeList;
-    private ArrayList<Water> waterList;
+    private final int numRows = style.numRows;
+    private final int numColumns = style.numColumns;
+    private final int squareSize = style.squareSize;
+    private final Point margin = style.margin;
+    private final Ammon ammon;
+    private final ArrayList<Sheep> sheepList;
+    private final ArrayList<Robber> robberList;
+    private final ArrayList<Tree> treeList;
+    private final ArrayList<Water> waterList;
 
     //this is used as a polymorphism.
-    private ArrayList<Sprite> objects;
+    private final ArrayList<Sprite> objects;
     private int numSheep;
+    private int numRobbers;
+
 
     // Constructor
     public Main() {
@@ -93,12 +96,12 @@ public class Main extends JPanel implements KeyListener {
         objects.addAll(waterList);
         objects.addAll(robberList);
 
-        for(var object: objects){
-            System.out.println(object);
-        }
+
         // count how many sheep in the map.
         numSheep = sheepList.size();
         System.out.println("Sheep is "+ numSheep);
+        numRobbers = robberList.size();
+        System.out.println("robbers are " +numRobbers);
 
     }
 
@@ -124,6 +127,10 @@ public class Main extends JPanel implements KeyListener {
         for(Sprite object: objects){
             object.draw(g);
         }
+        g.setColor(Color.BLACK);
+        g.drawString("Sheep Remaining: "+ numSheep, margin.x,numColumns*squareSize+margin.y*2 );
+        g.drawString("Robbers Remaining: "+ numRobbers, margin.x+ numRows*squareSize/2+margin.x*4,numColumns*squareSize+margin.y*2 );
+
     }
     //    Don't use those
     @Override
@@ -134,36 +141,50 @@ public class Main extends JPanel implements KeyListener {
     public void keyReleased(KeyEvent e) {
 
     }
-
-
     // setting up Dpad
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-
-        // Arrow key handling
-        if (key == KeyEvent.VK_LEFT) {
-            moveAmmon(-1, 0);
-        } else if (key == KeyEvent.VK_RIGHT) {
-            moveAmmon(1, 0);
-        } else if (key == KeyEvent.VK_UP) {
-            moveAmmon(0, -1);
-        } else if (key == KeyEvent.VK_DOWN) {
-            moveAmmon(0, 1);
-        }
-    }
-    //method of moving Ammon
-    private void moveAmmon(int dx, int dy) {
+        String status = null;
         Point nextPos = ammon.getter();
-        nextPos.translate(dx, dy); // update relative position
+        switch (key) {
+            case KeyEvent.VK_UP -> {
+                nextPos.y--;
+                status = "up";
+            }
+            case KeyEvent.VK_DOWN -> {
+                nextPos.y++;
+                status = "down";
+            }
+            case KeyEvent.VK_LEFT -> {
+                nextPos.x--;
+                status = "left";
+            }
+            case KeyEvent.VK_RIGHT -> {
+                nextPos.x++;
+                status = "right";
+            }
+            case KeyEvent.VK_W -> {
+                shoot("north");
+                System.out.println("press W");
+            }
+            case KeyEvent.VK_S -> {
+                shoot("south");
+                System.out.println("press S");
+            }
+            case KeyEvent.VK_D -> {
+                System.out.println("press D");
+                shoot("east");
+            }
+            case KeyEvent.VK_A -> {
+                System.out.println("press A");
+                shoot("west");
+            }
+            default -> {
+            }
+        }
 
-        if (isWithinMapBounds(nextPos) && !hitATree(nextPos)) {
-            ammon.setLocation(nextPos); // finalize
-            repaint(); // update the location of image
-        }
-        else{
-            nextPos.translate(-dx, -dy); // reset position.
-        }
+        if (isWithinMapBounds(nextPos)) {
         /*
         When the boolean is true, this sheep will disappear.
         Also, the counter of sheep will negative one.
@@ -171,48 +192,166 @@ public class Main extends JPanel implements KeyListener {
         In terms of water and robber, it is same methods with sheep.
         when the status is true, some action will happen.
         */
-        for (Sheep sheep : sheepList) {
-            if(ammon.isTouching(sheep)){
-                sheep.setLocation(null);
-                numSheep--;
-                if (numSheep == 0) {
-                    int option = JOptionPane.showConfirmDialog(this, "Congratulations! You rescued all the sheep! \n Do you want to continue?", "you clear!" , JOptionPane.YES_NO_OPTION);
-                    if(option == 0){
+            if (!(hitATree(nextPos))) {
+                ammon.setLocation(nextPos); // finalize
+                repaint(); // update the location of image
+                for (Sheep sheep : sheepList) {
+                    if (ammon.isTouching(sheep)) {
+                        sheepList.remove(sheep);
+                        sheep.setLocation(null);
+                        numSheep--;
+                        if (numSheep == 0) {
+                            int option = JOptionPane.showConfirmDialog(this, "Congratulations! You rescued all the sheep! \n Do you want to continue?", "you clear!", JOptionPane.YES_NO_OPTION);
+                            if (option == 0) {
+                                reset();
+                                break;
+                            } else if (option == 1) {
+                                System.exit(0);
+                            }
+                        }
+                    }
+                }
+                for (Water water : waterList) {
+                    if (ammon.isTouching(water)) {
+
+                        int option = JOptionPane.showConfirmDialog(this, "Sorry, Ammon died in the water. \n Do you want to continue?", "you are dead", JOptionPane.YES_NO_OPTION);
+                        if (option == 0) {
+                            reset();
+                            break;
+                        } else if (option == 1) {
+                            System.exit(0);
+                        }
+                    }
+                }
+                for (Robber robber : robberList) {
+                    if (ammon.isNear(robber)) {
+                        int option = JOptionPane.showConfirmDialog(this, "Sorry, Ammon died near a robber. \n Do you want to continue?", "you are dead", JOptionPane.YES_NO_OPTION);
+                        if (option == 0) {
+                            reset();
+                            break;
+                        } else if (option == 1) {
+                            System.exit(0);
+                        }
+                    }
+                }
+            }else{
+                if(Objects.equals(status, "up")){
+                    nextPos.y++;
+                }
+                else if(Objects.equals(status, "down")){
+                    nextPos.y--;
+                }
+                else if(Objects.equals(status, "left")){
+                    nextPos.x++;
+                }
+                else if(Objects.equals(status, "right")){
+                    nextPos.x--;
+                }
+            }
+        }
+    }
+    private void shoot(String direction){
+        // get Ammon's relative position
+        int x = ammon.getter().x;
+        int y = ammon.getter().y;
+
+        // check which sprite objects there are in the same line.
+        if (Objects.equals(direction, "north")){
+            for (int i = y; i >= 0; i--) {
+                Point pos = new Point(x, i);
+                if (shootRobber(pos)) {
+                    return;
+                }
+                if (shootSheep(pos)) {
+                    return;
+                }
+                if (hitATree(pos)) {
+                    return;
+                }
+            }
+        }
+        else if(Objects.equals(direction, "south")){
+            for (int i = y; i < numRows; i++) {
+                Point pos = new Point(x, i);
+                if (shootRobber(pos)) {
+                    return;
+                }
+                if (shootSheep(pos)) {
+                    return;
+                }
+                if (hitATree(pos)) {
+                    return;
+                }
+            }
+
+        }
+        else if(Objects.equals(direction, "east")){
+            for (int i = x; i < numColumns; i++) {
+                Point pos = new Point(i, y);
+                if (shootRobber(pos)) {
+                    return;
+                }
+                if (shootSheep(pos)) {
+                    return;
+                }
+                if (hitATree(pos)) {
+                    return;
+                }
+            }
+        }
+        else if(Objects.equals(direction, "west")){
+            for (int i = x; i >= 0; i--) {
+                Point pos = new Point(i, y);
+                if (shootRobber(pos)) {
+                    return;
+                }
+                if (shootSheep(pos)) {
+                    return;
+                }
+                if (hitATree(pos)) {
+                    return;
+                }
+            }
+        }
+    }
+
+    // if Ammon shoot robbers and there is no tree
+    private boolean shootRobber(Point pos) {
+        for (Robber robber : robberList) {
+            if (robber.getter().equals(pos)) {
+                robberList.remove(robber);
+                robber.setLocation(null);
+                numRobbers--;
+                if (numRobbers == 0) {
+                    int option = JOptionPane.showConfirmDialog(this, "Congratulations! You have eliminated all the robbers. \n Do you want to continue?", "you clear", JOptionPane.YES_NO_OPTION);
+                    if (option == 0) {
                         reset();
                         break;
                     } else if (option == 1) {
                         System.exit(0);
                     }
                 }
+                return true;
             }
         }
-        for (Water water: waterList){
-            if(ammon.isTouching(water)){
-
-                int option = JOptionPane.showConfirmDialog(this, "Sorry, Ammon died in the water. \n Do you want to continue?", "you are dead" , JOptionPane.YES_NO_OPTION);
-                if(option == 0){
-                    reset();
-                    break;
-                } else if (option == 1) {
-                    System.exit(0);
-                }
-            }
-        }
-        for(Robber robber: robberList){
-            if(ammon.isNear(robber)){
-                int option = JOptionPane.showConfirmDialog(this, "Sorry, Ammon died near a robber. \n Do you want to continue?", "you are dead" , JOptionPane.YES_NO_OPTION);
-                if(option == 0){
-                    reset();
-                    break;
-                } else if (option == 1) {
-                    System.exit(0);
-                }
-            }
-        }
-
-
+        return false;
     }
-
+    // if Ammon shoot sheep
+    private boolean shootSheep(Point pos) {
+        for (Sheep sheep : sheepList) {
+            if (sheep.getter().equals(pos)) {
+                int option = JOptionPane.showConfirmDialog(this, "Oops! You killed a sheep. \n Do you want to continue?", "you killed a sheep.", JOptionPane.YES_NO_OPTION);
+                if (option == 0) {
+                    reset();
+                    break;
+                } else if (option == 1) {
+                    System.exit(0);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
     // prevent going to out of the map
     private boolean isWithinMapBounds(Point p) {
         return p.x >= 0 && p.x < numColumns && p.y >= 0 && p.y < numRows;
@@ -228,17 +367,20 @@ public class Main extends JPanel implements KeyListener {
         return false;
     }
 
-
     /*
     when it is called, all sheep will set in the default position.
     then sheep counter will be default number.
-    After those sheeps will be added into sheepList and objects List.
+    After those sheep will be added into sheepList and objects List.
      */
     private void reset(){
         for (Sheep sheep: sheepList){
             sheep.setLocation(null);
         }
+        for (Robber robber: robberList){
+            robber.setLocation(null);
+        }
         sheepList.clear();
+        robberList.clear();
         sheepList.add(new Sheep(4, 0));
         sheepList.add(new Sheep(9, 0));
         sheepList.add(new Sheep(0, 3));
@@ -247,21 +389,21 @@ public class Main extends JPanel implements KeyListener {
         sheepList.add(new Sheep(2, 6));
         sheepList.add(new Sheep(0, 7));
         sheepList.add(new Sheep(7, 9));
+        robberList.add(new Robber(1, 0));
+        robberList.add(new Robber(7, 2));
+        robberList.add(new Robber(5, 5));
+        robberList.add(new Robber(9, 7));
+        robberList.add(new Robber(2, 9));
         ammon.setLocation(5,8);
         objects.addAll(sheepList);
+        objects.addAll(robberList);
         numSheep = sheepList.size();
+        numRobbers = robberList.size();
         repaint();
         System.out.println("everything is reset");
         System.out.println("Sheep is: "+numSheep);
 
     }
-
-
-
-
-
-
-
     public static void main(String[] args) {
         Style style = new Style();
         JFrame window = new JFrame();
@@ -271,6 +413,4 @@ public class Main extends JPanel implements KeyListener {
         window.setVisible(true);
 
     }
-
-
 }

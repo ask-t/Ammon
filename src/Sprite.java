@@ -47,13 +47,24 @@ abstract class Sprite {
 
     // when the position of Ammon is the same with water objects, it will return true.
     public boolean isTouching(Sprite other){
-        return this.getter().equals(other.getter());
+        return equals(other);
     }
     // when the position of Ammon is the near to the robbers objects, it will return true.
     public boolean isNear(Sprite other){
         Point re = this.getter();
         Point ot = other.getter();
         return re.x == ot.x - 1 && re.y == ot.y || re.x == ot.x + 1 && re.y == ot.y || re.x == ot.x && re.y == ot.y - 1 || re.x == ot.x && re.y == ot.y + 1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Sprite) {
+            Sprite other = (Sprite) obj;
+            return this.getter().equals(other.getter());
+        } else {
+            return false;
+        }
+
     }
 
 }
